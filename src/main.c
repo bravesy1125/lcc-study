@@ -1,3 +1,7 @@
+/*
+这个文件是编译器的main主文件。处理命令行的参数，然后最重要的是调用program()函数。这个函数从名字就能看出来是编译器的主体。
+*/
+
 #include "c.h"
 
 static char rcsid[] = "$Name$($Id$)";

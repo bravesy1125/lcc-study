@@ -1,3 +1,8 @@
+/*
+	分配编译器的内存。LCC的内存管理非常简单，下面会详细注释。
+*/
+
+
 #include "c.h"
 struct block {
 	struct block *next;
