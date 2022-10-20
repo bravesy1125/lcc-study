@@ -55,9 +55,9 @@ void *allocate(unsigned long n, unsigned a)
 			}
 			ap->limit = (char *)ap + m;
 		}
-		ap->avail = (char *)((union header *)ap + 1);
+		ap->avail = (char *)((union header *)ap + 1);//在这里进行新获取的freeblocks的初始化清空。
 		ap->next = NULL;
-		arena[a] = ap;
+		arena[a] = ap;// arena[a]总是指向first链表的最后的一个元素。
 	}
 	ap->avail += n;
 	return ap->avail - n;
@@ -71,8 +71,8 @@ void *newarray(unsigned long m, unsigned long n, unsigned a)
 void deallocate(unsigned a)
 {
 	assert(a < NELEMS(arena));
-	arena[a]->next = freeblocks;
-	freeblocks = first[a].next;
-	first[a].next = NULL;
-	arena[a] = &first[a];
+	arena[a]->next = freeblocks;// first【a】链表最后一个元素指向freeblocks的开头。
+	freeblocks = first[a].next;// freeblocks指针指向first链表的第一个元素。
+	first[a].next = NULL;// 清空first【a】链表。
+	arena[a] = &first[a];//arena[a] 重新指向 first[a]
 }

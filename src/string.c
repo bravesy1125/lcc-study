@@ -64,11 +64,11 @@ static int scatter[] = {	/* map characters to random values */
 char *string(const char *str) {
 	const char *s;
 
-	for (s = str; *s; s++)
+	for (s = str; *s; s++)//找到字符串的null末尾。
 		;
-	return stringn(str, s - str);
+	return stringn(str, s - str);// s -str 就是长度。
 }
-char *stringd(long n) {
+char *stringd(long n) {// 十进制转换为string
 	char str[25], *s = str + sizeof (str);
 	unsigned long m;
 
@@ -85,7 +85,7 @@ char *stringd(long n) {
 		*--s = '-';
 	return stringn(s, str + sizeof (str) - s);
 }
-char *stringn(const char *str, int len) {
+char *stringn(const char *str, int len) {//这个才是分配的主要函数.
 	int i;
 	unsigned int h;
 	const char *end;
@@ -100,18 +100,18 @@ char *stringn(const char *str, int len) {
 			const char *s1 = str;
 			char *s2 = p->str;
 			do {
-				if (s1 == end)
+				if (s1 == end)//如果到了末尾还一样,那就返回这个地址.
 					return p->str;
-			} while (*s1++ == *s2++);
+			} while (*s1++ == *s2++);// 对比每一个字符.
 		}
-	{
+	{//如果上面没有在已经分配的空间中找到字符串，就分配一块新的内存。这里似乎是又进行了一次内存分配，不知道能节省多少空间，不管感觉是没有什么必要。当然了，把字符串分配到一起比较便与调试。
 		static char *next, *strlimit;
-		if (len + 1 >= strlimit - next) {
+		if (len + 1 >= strlimit - next) {//strlimit - next 就是当前字符串分配区剩余的空间,如果不够,再分配4K字节.
 			int n = len + 4*1024;
-			next = allocate(n, PERM);
+			next = allocate(n, PERM);// arena[0] 和first[0]是永久分配的内存。
 			strlimit = next + n;
 		}
-		NEW(p, PERM);
+		NEW(p, PERM);//这里分配的是string结构,把这个新分配的string结构p保存到buckets里面,同时这个p的str指向字符串的地址.
 		p->len = len;
 		for (p->str = next; str < end; )
 			*next++ = *str++;

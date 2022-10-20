@@ -30,7 +30,7 @@ static Symbol *parameters(Type);
 static Type specifier(int *);
 static Type structdcl(int);
 static Type tnode(int, Type);
-void program(void)
+void program(void)//这个函数居然这么短!只做最简单的判断然后跳入相应的函数进行处理.
 {
 	int n;
 
@@ -43,17 +43,17 @@ void program(void)
 			if (!(glevel >= 3 || xref))
 				deallocate(FUNC);
 		}
-		else if (t == ';')
+		else if (t == ';')//只有分号,空语句.
 		{
 			warning("empty declaration\n");
 			t = gettok();
 		}
-		else
+		else//什么声明都不是:其实是一种错误.
 		{
 			error("unrecognized declaration\n");
 			t = gettok();
 		}
-	if (n == 0)
+	if (n == 0)//没有任何token,则等于是空的.
 		warning("empty input file\n");
 }
 static Type specifier(int *sclass)

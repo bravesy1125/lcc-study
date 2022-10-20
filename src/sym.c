@@ -30,7 +30,7 @@ int level = GLOBAL;
 static int tempid;
 List loci, symbols;
 
-Table newtable(int arena) {
+Table newtable(int arena) {//分配新的table并返回指针.
 	Table new;
 
 	NEW0(new, arena);
@@ -60,11 +60,11 @@ void foreach(Table tp, int lev, void (*apply)(Symbol, void *), void *cl) {
 		src = sav;
 	}
 }
-void enterscope(void) {
+void enterscope(void) {// 进入新的作用域,增加level.
 	if (++level == LOCAL)
 		tempid = 0;
 }
-void exitscope(void) {
+void exitscope(void) {// 退出新的作用域,减少level.types和identifiers指向上一层table.
 	rmtypes(level);
 	if (types->level == level)
 		types = types->previous;
@@ -72,13 +72,13 @@ void exitscope(void) {
 		if (Aflag >= 2) {
 			int n = 0;
 			Symbol p;
-			for (p = identifiers->all; p && p->scope == level; p = p->up)
+			for (p = identifiers->all; p && p->scope == level; p = p->up)//计算一共有多少level,多于127则警告一下.
 				if (++n > 127) {
 					warning("more than 127 identifiers declared in a block\n");
 					break;
 				}
 		}
-		identifiers = identifiers->previous;
+		identifiers = identifiers->previous;//这里并不释放空间,只是将identifiers指向上一层结构,所以肯定是有别的地方会释放所有这些tables占用的空间.
 	}
 	assert(level >= GLOBAL);
 	--level;
@@ -89,7 +89,7 @@ Symbol install(const char *name, Table *tpp, int level, int arena) {
 	unsigned h = (unsigned long)name&(HASHSIZE-1);
 
 	assert(level == 0 || level >= tp->level);
-	if (level > 0 && tp->level < level)
+	if (level > 0 && tp->level < level)//如果level提升需要建立一个新的table,则创建一个新的table.
 		tp = *tpp = table(tp, level);
 	NEW0(p, arena);
 	p->sym.name = (char *)name;
@@ -130,19 +130,19 @@ Symbol relocate(const char *name, Table src, Table dst) {
 	dst->all = &p->sym;
 	return &p->sym;
 }
-Symbol lookup(const char *name, Table tp) {
+Symbol lookup(const char *name, Table tp) {//lookup会沿着层级previous,层层查找字符串.
 	struct entry *p;
 	unsigned h = (unsigned long)name&(HASHSIZE-1);
 
 	assert(tp);
 	do
 		for (p = tp->buckets[h]; p; p = p->link)
-			if (name == p->sym.name)
+			if (name == p->sym.name)//注意,这里其实只是比较了两个字符串的地址指针.
 				return &p->sym;
 	while ((tp = tp->previous) != NULL);
 	return NULL;
 }
-int genlabel(int n) {
+int genlabel(int n) {//标号,只增不减.
 	static int label = 1;
 
 	label += n;
@@ -194,7 +194,7 @@ Symbol constant(Type ty, Value v) {
 			case POINTER:  if (equalp(p)) return &p->sym; break;
 			default: assert(0);
 			}
-	NEW0(p, PERM);
+	NEW0(p, PERM);//常量不会被删除.
 	p->sym.name = vtoa(ty, v);
 	p->sym.scope = CONSTANTS;
 	p->sym.type = ty;
@@ -215,7 +215,7 @@ Symbol intconst(int n) {
 	v.i = n;
 	return constant(inttype, v);
 }
-Symbol genident(int scls, Type ty, int lev) {
+Symbol genident(int scls, Type ty, int lev) {//这个函数其实是产生一个临时变量,该变量的名字就是一个十进制常数,这个名字只是临时的,所以无所谓重复不重复.
 	Symbol p;
 
 	NEW0(p, lev >= LOCAL ? FUNC : PERM);
@@ -229,7 +229,7 @@ Symbol genident(int scls, Type ty, int lev) {
 	return p;
 }
 
-Symbol temporary(int scls, Type ty) {
+Symbol temporary(int scls, Type ty) {//另外一种产生临时变量的方法,其实跟上面的很类似,不过应用的地方不太一样.p->temporary这个成员为1.
 	Symbol p;
 
 	NEW0(p, FUNC);
@@ -241,7 +241,7 @@ Symbol temporary(int scls, Type ty) {
 	p->generated = 1;
 	return p;
 }
-Symbol newtemp(int sclass, int tc, int size) {
+Symbol newtemp(int sclass, int tc, int size) {//调用temporary().
 	Symbol p = temporary(sclass, btot(tc, size));
 
 	(*IR->local)(p);

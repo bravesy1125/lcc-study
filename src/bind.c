@@ -1,3 +1,8 @@
+/*
+	这个文件有关于不同的CPU架构，感觉对于我没有什么用处。暂时先不用.
+*/
+
+
 #include "c.h"
 #undef yy
 #define yy \

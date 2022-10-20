@@ -12,7 +12,7 @@ char kind[] = {
 };
 int wflag;		/* != 0 to suppress warning messages */
 
-void test(int tok, char set[]) {
+void test(int tok, char set[]) {//感觉逻辑上和expect并没有任何区别！！！！
 	if (t == tok)
 		t = gettok();
 	else {
@@ -22,16 +22,16 @@ void test(int tok, char set[]) {
 			t = gettok();
 	}
 }
-void expect(int tok) {
+void expect(int tok) {// 测试必须的token，如果不是则报错。其实就是语法错误。
 	if (t == tok)
 		t = gettok();
 	else {
 		error("syntax error; found");
 		printtoken();
-		fprint(stderr, " expecting `%k'\n", tok);
+		fprint(stderr, " expecting '%k'\n", tok);
 	}
 }
-void error(const char *fmt, ...) {
+void error(const char *fmt, ...) {// 打印错误信息。
 	va_list ap;
 
 	if (errcnt++ >= errlimit) {
@@ -47,7 +47,7 @@ void error(const char *fmt, ...) {
 	va_end(ap);
 }
 
-void skipto(int tok, char set[]) {
+void skipto(int tok, char set[]) {// 尝试跳到set制定的token,其实没有太大的意义，可以算是一种试图修复错误的举动，但是我觉得既然是错误，显示给用户就是最好的解决方案。
 	int n;
 	char *s;
 
@@ -72,7 +72,7 @@ void skipto(int tok, char set[]) {
 		fprint(stderr, "\n");
 }
 /* fatal - issue fatal error message and exit */
-int fatal(const char *name, const char *fmt, int n) {
+int fatal(const char *name, const char *fmt, int n) {// 这个函数也没什么实际的意义，基本上就是调用error().
 	print("\n");
 	errcnt = -1;
 	error("compiler error in %s--", name);
@@ -82,7 +82,7 @@ int fatal(const char *name, const char *fmt, int n) {
 }
 
 /* printtoken - print current token preceeded by a space */
-static void printtoken(void) {
+static void printtoken(void) {// 这个函数也没什么实际的意义，基本上就是调用error().
 	switch (t) {
 	case ID: fprint(stderr, " `%s'", token); break;
 	case ICON:
@@ -125,7 +125,7 @@ static void printtoken(void) {
 }
 
 /* warning - issue warning error message */
-void warning(const char *fmt, ...) {
+void warning(const char *fmt, ...) {// 跟error基本上一样！！
 	va_list ap;
 
 	va_start(ap, fmt);
